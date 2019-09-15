@@ -7,24 +7,47 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
 ```
 
-## R Markdown
+# Problem 1
+```{r setup_df}
+df <- tibble(
+  norm_samp = rnorm(8),
+  sample_ge0 = norm_samp >= 0, 
+  character_vector = c("one", "two", "three", "four", "five", "six", "seven", "eight"),
+  factor_vector = factor(x = c("a", "b", "c", "a", "a", "b", "c", "c"), levels = c("a", "b", "c"))
+)
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+#try to take the mean of each variable
+mean(pull(df, norm_samp))
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+mean(pull(df, sample_ge0))
 
-```{r cars}
-summary(cars)
+mean(pull(df, character_vector)) #error: argument is not numeric or logical: returning NA[1] NA
+
+mean(pull(df, factor_vector)) #error: argument is not numeric or logical: returning NA[1] NA
 ```
 
-## Including Plots
+```{r coerce_numeric, results = FALSE}
+mean(pull(df, as.numeric(sample_ge0)))
 
-You can also embed plots, for example:
+mean(pull(df, as.numeric(character_vector)))
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+mean(pull(df, as.numeric(factor_vector)))
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+The logical variable is converted to a numeric variable with 0's (FALSE) and 1's (TRUE), and the mean is able to be computed using the `as.numeric` function. However, the character and factor variables still produce an error.
+
+```{r }
+#convert the logical vector to numeric and multiply the random sample by the result.
+as.numeric(pull(df,sample_ge0)) * pull(df, norm_samp)
+
+#convert the logical vector to a factor, and multiply the random sample by the result.
+as.factor(pull(df,sample_ge0)) * pull(df, norm_samp)
+
+#convert the logical vector to a factor and then convert the result to numeric, and multiply the random sample by the result
+as.numeric(as.factor(pull(df,sample_ge0))) * pull(df, norm_samp)
+```
+
