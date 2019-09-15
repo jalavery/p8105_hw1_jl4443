@@ -12,7 +12,7 @@ library(tidyverse)
 ```
 
 # Problem 1
-```{r setup_df}
+```{r setup_df_prob1}
 df <- tibble(
   norm_samp = rnorm(8),
   sample_ge0 = norm_samp >= 0, 
@@ -51,3 +51,37 @@ as.factor(pull(df,sample_ge0)) * pull(df, norm_samp)
 as.numeric(as.factor(pull(df,sample_ge0))) * pull(df, norm_samp)
 ```
 
+# Problem 2
+```{r setup_df_prob2}
+df2 <- tibble(
+  x = rnorm(500),
+  y = rnorm(500),
+  x_plus_y_gt1_logical = (x + y > 1),
+  x_plus_y_gt1_numeric = as.numeric(x_plus_y_gt1_logical),
+  x_plus_y_gt1_factor = as.factor(x_plus_y_gt1_logical)
+)
+```
+
+The dataset includes `r ncol(df2)` variables with `r nrow(df2)` observations. Variable x has mean `r mean(pull(df2, x))` and standard deviation `r sd(pull(df2, x))`. From the random samples, `r 100*mean(pull(df2, x_plus_y_gt1_numeric))`% of instances have x + y > 1. 
+
+```{r plot_df2_logical}
+ggplot(data = df2, aes(x = x, y = y, color = x_plus_y_gt1_logical)) +
+  geom_point()
+
+#export to project directory
+ggsave(filename = "hw1_figure1_logical_color_scale.png")
+```
+
+```{r plot_df2_numeric}
+ggplot(data = df2, aes(x = x, y = y, color = x_plus_y_gt1_numeric)) +
+  geom_point()
+```
+
+Using a numeric variable to indicate the color of the scatterplot results in a color gradient spanning the range of the variable, despite the fact that there are no instances of the variable having a value between 0 and 1. 
+
+```{r plot_df2_factor}
+ggplot(data = df2, aes(x = x, y = y, color = x_plus_y_gt1_factor)) +
+  geom_point()
+```
+
+Using a factor variable to determine the color of the points on the scatterplot is similar to using the logical variable to indicate the color. 
