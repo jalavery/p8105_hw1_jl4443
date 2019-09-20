@@ -13,32 +13,42 @@ library(tidyverse)
 
 # Problem 1
 ```{r setup_df_prob1}
+# create data frame per specifications in HW1
 df <- tibble(
   norm_samp = rnorm(8),
-  sample_ge0 = norm_samp >= 0, 
+  sample_ge0 = (norm_samp >= 0), 
   character_vector = c("one", "two", "three", "four", "five", "six", "seven", "eight"),
   factor_vector = factor(x = c("a", "b", "c", "a", "a", "b", "c", "c"), levels = c("a", "b", "c"))
 )
+```
 
-#try to take the mean of each variable
+From the above data frame, we can try to take the mean of each type of variable (numeric, logical, character and factor). We see that the mean cannot be computed for character or factor varibles based on the warning messages below. 
+
+```{r mean_prob1}
+# try to take the mean of each variable
 mean(pull(df, norm_samp))
 
 mean(pull(df, sample_ge0))
 
-mean(pull(df, character_vector)) #error: argument is not numeric or logical: returning NA[1] NA
+mean(pull(df, character_vector)) 
 
-mean(pull(df, factor_vector)) #error: argument is not numeric or logical: returning NA[1] NA
+mean(pull(df, factor_vector)) 
 ```
 
+Alternatively, we could try to coerce each non-numeric variable to a numeric variable to then try to compute the mean (output not shown). The logical variable is converted to a numeric variable with 0's (FALSE) and 1's (TRUE), and the mean can be computed. The function `as.numeric` explicitly converted the logical vector to a numeric vector, which appears to be what happened in the above exercise taking the mean of a logical vector automatically.  However, the character and factor variables still produce a warning and a mean is not calculated (a value of NA is returned). 
+
 ```{r coerce_numeric, results = FALSE}
+#coerce the logical variable to numeric and try to take the mean
 mean(pull(df, as.numeric(sample_ge0)))
 
+#coerce the character variable to numeric and try to take the mean
 mean(pull(df, as.numeric(character_vector)))
 
+#coerce the factor variable to numeric and try to take the mean
 mean(pull(df, as.numeric(factor_vector)))
 ```
 
-The logical variable is converted to a numeric variable with 0's (FALSE) and 1's (TRUE), and the mean is able to be computed using the `as.numeric` function. However, the character and factor variables still produce an error.
+We can convert the logical vector and try to perform some operations. When the logical vector is converted to a numeric vector, we are able to multiply it by the mean of the random sample. When the logical vector is converted to a factor, we cannot multiply the factor vector by the mean of the random sample. However, converting the logical vector to a factor vector and then to a numeric vector does allow us to perform a mathematical operation on the vector by multiplying it by the mean of the result. 
 
 ```{r }
 #convert the logical vector to numeric and multiply the random sample by the result.
@@ -64,6 +74,8 @@ df2 <- tibble(
 
 The dataset includes `r ncol(df2)` variables with `r nrow(df2)` observations. Variable x has mean `r mean(pull(df2, x))` and standard deviation `r sd(pull(df2, x))`. From the random samples, `r 100*mean(pull(df2, x_plus_y_gt1_numeric))`% of instances have x + y > 1. 
 
+## Figure 1
+
 ```{r plot_df2_logical}
 ggplot(data = df2, aes(x = x, y = y, color = x_plus_y_gt1_logical)) +
   geom_point()
@@ -72,16 +84,22 @@ ggplot(data = df2, aes(x = x, y = y, color = x_plus_y_gt1_logical)) +
 ggsave(filename = "hw1_figure1_logical_color_scale.png")
 ```
 
+Using a logical factor to create the color scale results in two distinct colors: one color per each logical response (TRUE/FALSE).
+
+## Figure 2
+
 ```{r plot_df2_numeric}
 ggplot(data = df2, aes(x = x, y = y, color = x_plus_y_gt1_numeric)) +
   geom_point()
 ```
 
-Using a numeric variable to indicate the color of the scatterplot results in a color gradient spanning the range of the variable, despite the fact that there are no instances of the variable having a value between 0 and 1. 
+Using a numeric variable to indicate the color of the scatterplot results in a color gradient spanning the range of the variable, despite the fact that only the two extreme colors show up on the actual plot because there are no instances of the variable having a value between 0 and 1. 
+
+## Figure 3
 
 ```{r plot_df2_factor}
 ggplot(data = df2, aes(x = x, y = y, color = x_plus_y_gt1_factor)) +
   geom_point()
 ```
 
-Using a factor variable to determine the color of the points on the scatterplot is similar to using the logical variable to indicate the color. 
+Using a factor variable to determine the color of the points on the scatterplot is similar to using the logical variable to indicate the color. There is one color per level of the factor (TRUE, FALSE). 
